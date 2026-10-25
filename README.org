@@ -1,0 +1,84 @@
+#+title: LispM Kit
+
+#+HTML: <p align="center"><a href="https://github.com/LispMachineLab/lispm-kit/actions/workflows/test.yml"><img src="https://github.com/LispMachineLab/lispm-kit/actions/workflows/test.yml/badge.svg" alt="test" /></a></p>
+
+What the applications of LispM's App Store are made with, in any Emacs 30.1 or later.  It knows
+of no interface: Emacs's own shows what an application declares with it as it shows any mode's,
+and [[https://github.com/LispMachineLab/lispm-desktop][LispM Desktop]] reads the same declarations from the mode's symbol, for its buttons and its
+window of keys.  In code, the prefix is ~lispm-kit-~.
+
+* An application's commands, each declared once
+
+An application's mode used to say what a command is three or four times over: its key in the
+keymap, its item in an ~easy-menu-define~, and again in whatever interface showed it as a button
+or listed its key.  Each copy could drift from the others.  ~lispm-kit-define-commands~ says it
+once:
+
+#+begin_src emacs-lisp
+(require 'lispm-kit-commands)
+
+(lispm-kit-define-commands lispm-rotom-mode
+  :menu "Rotom"
+  (lispm-rotom-start-or-stop
+   :key "s" :help "Start or stop the daemon"
+   :label (if (lispm-rotom-running-p) "Stop Daemon" "Start Daemon")
+   :button (if (lispm-rotom-running-p) "Stop" "Start")
+   :enabled (and (lispm-rotom-installed-p) (not lispm-rotom-busy)))
+  (lispm-rotom-restart
+   :key "r" :help "Restart the daemon" :label "Restart Daemon" :button "Restart"
+   :enabled (and (lispm-rotom-running-p) (not lispm-rotom-busy)))
+  "---"
+  (lispm-rotom-reload :key "g" :help "Read Rotom again" :label "Read Again"))
+#+end_src
+
+A command's properties:
+
+| ~:key~      | a key, or a list of them, as ~keymap-set~ takes them                                |
+| ~:label~    | the words of its menu item, a string or a form returning one; without it, no item |
+| ~:help~     | what it does, in a few words                                                       |
+| ~:enabled~  | a form, non-nil while it can be used                                               |
+| ~:button~   | makes it one of the main commands: the words of its button, or ~t~ for ~:label~'s |
+| ~:style~    | ~toggle~ or ~radio~, for an item checked or not                                    |
+| ~:selected~ | a form, non-nil while its item is checked                                          |
+
+Any form may be a function instead, ~(lambda () ...)~ or ~#'NAME~; all are evaluated in the mode's
+buffer.  ~:menu TITLE~ starts a menu of the menu bar, holding what follows up to the next one;
+commands before the first are in no menu.  The menus are made one after another as
+~easy-menu-define~ makes them, so the menu bar shows the later ones first.  Besides commands, a
+menu holds ~"---"~ separators, submenus ~(TITLE ITEM ...)~ (easy-menu's keywords, as ~:filter~,
+may follow the title), a command declared elsewhere in the form, named alone, to put its item
+there rather than where it is declared, which keeps its place among the buttons, and items as
+~easy-menu-define~ takes them, ~[...]~, as they are.
+
+The keys are bound in ~MODE-map~, defined if it is not yet, and the menus are its menu bar's:
+plain Emacs shows them, and =C-h m= lists the keys.  What was declared is MODE's
+~lispm-kit-commands~ property, a list of property lists in the order declared, one a command:
+~:command~, ~:key~ (a list), ~:label~, ~:help~, ~:enabled~, ~:button~, ~:style~, ~:selected~,
+the forms made functions of no arguments and ~:button t~ made the words of ~:label~.  An
+interface needs nothing of this library to read it:
+
+#+begin_src emacs-lisp
+(seq-filter (lambda (command) (plist-get command :button))
+            (get 'lispm-rotom-mode 'lispm-kit-commands))
+#+end_src
+
+The words are in English; an interface may translate them where it shows them.
+
+* Installing it
+
+LispM's App Store installs it before the applications that need it.  Elsewhere, from git:
+
+#+begin_src emacs-lisp
+(package-vc-install "https://github.com/LispMachineLab/lispm-kit")
+#+end_src
+
+An application names it in its =Package-Requires=, as ~(lispm-kit "0.1.0")~, and requires
+~lispm-kit-commands~.
+
+* Testing
+
+=make test compile= runs the tests and byte-compiles the sources, warnings counted as errors.
+
+* License
+
+GNU Affero General Public License, version 3 or later: see [[file:LICENSE][LICENSE]].
