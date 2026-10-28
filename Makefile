@@ -1,11 +1,11 @@
 EMACS ?= emacs
 
-FILES = lispm-kit.el lispm-kit-commands.el
+FILES = lispm-kit.el lispm-kit-commands.el lispm-kit-i18n.el lispm-kit-i18n-check.el
 
 .PHONY: test compile
 
 test:
-	$(EMACS) -Q --batch -L . -l test/lispm-kit-test.el -f ert-run-tests-batch-and-exit
+	$(EMACS) -Q --batch -L . -l test/lispm-kit-test.el -l test/lispm-kit-i18n-test.el -f ert-run-tests-batch-and-exit
 
 # A check: the .elc files are removed again, as they would shadow the
 # sources of a checkout Emacs loads from.

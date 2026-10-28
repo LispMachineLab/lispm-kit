@@ -2,10 +2,11 @@
 
 #+HTML: <p align="center"><a href="https://github.com/LispMachineLab/lispm-kit/actions/workflows/test.yml"><img src="https://github.com/LispMachineLab/lispm-kit/actions/workflows/test.yml/badge.svg" alt="test" /></a></p>
 
-What the applications of LispM's App Store are made with, in any Emacs 30.1 or later.  It knows
-of no interface: Emacs's own shows what an application declares with it as it shows any mode's,
-and [[https://github.com/LispMachineLab/lispm-desktop][LispM Desktop]] reads the same declarations from the mode's symbol, for its buttons and its
-window of keys.  In code, the prefix is ~lispm-kit-~.
+What LispM and the applications of its App Store are made with, in any Emacs 30.1 or later: an
+application's commands, each declared once, and a program's words, in the language spoken.  It
+knows of no interface: Emacs's own shows what an application declares with it as it shows any
+mode's, and [[https://github.com/LispMachineLab/lispm-desktop][LispM Desktop]] reads the same declarations from the mode's symbol, for its buttons and
+its window of keys.  In code, the prefix is ~lispm-kit-~.
 
 * An application's commands, each declared once
 
@@ -64,6 +65,55 @@ interface needs nothing of this library to read it:
 
 The words are in English; an interface may translate them where it shows them.
 
+* A program's words, in the language spoken
+
+A program's words are written in English in its code, and shown in English, German, French,
+Japanese or Chinese, Simplified or Traditional, from catalogs of its own, one a language.  What
+finds the language, reads the catalogs and translates is ~lispm-kit-i18n~, once for every
+program: LispM Agent, LispM Desktop and LispM UI each keep only their catalogs.  A program says
+once where they are and how it chooses its language, as a domain, a symbol naming its words:
+
+#+begin_src emacs-lisp
+(require 'lispm-kit-i18n)
+
+(defcustom lispm-mail-language nil
+  "The language LispM Mail speaks, or nil for the program around's, else the computer's."
+  :type 'symbol)
+(defvar lispm-mail-language-functions nil)
+(defvar lispm-mail-language-changed-hook nil)
+
+(lispm-kit-i18n-define 'lispm-mail
+  :directory (expand-file-name "i18n" lispm-mail-directory)
+  :language 'lispm-mail-language
+  :language-functions 'lispm-mail-language-functions
+  :changed-hook 'lispm-mail-language-changed-hook)
+
+(defun lispm-mail-tr (message &rest args)
+  (apply #'lispm-kit-tr 'lispm-mail message args))
+#+end_src
+
+The domain speaks the language its ~:language~ variable names, else that of the program it is
+shown by, which a function of its ~:language-functions~ returns, else the computer's own; once
+that changes, its ~:changed-hook~ runs, to draw again what shows words.  Every word a person
+reads passes through ~lispm-kit-tr~, ~lispm-kit-tr-n~ for a count, ~lispm-kit-tr-in~ for words
+meant in a context, or ~lispm-kit-format-time~; words kept as a file loads are marked with
+~lispm-kit-tr-noop~ and translated where shown.  What models read stays English, in
+~lispm-kit-in-english~.
+
+The catalogs are the files of the domain's ~:directory~, one per language, named by its tag, as
+=fr.eld=:
+
+#+begin_src emacs-lisp
+(:name "Français"
+ :messages (("Open" . "Ouvrir")
+            (("state" . "Open") . "Ouvert")
+            ("%d message" . ("%d message" "%d messages"))))
+#+end_src
+
+=lispm-kit-i18n-check.el= is for a program's tests: ~lispm-kit-i18n-messages~ finds the
+messages its code gives to translate, and ~lispm-kit-i18n-problems~ says what its catalogs lack
+or hold no longer, ~lispm-kit-i18n-report~ printing it for =make i18n=.
+
 * Installing it
 
 LispM's App Store installs it before the applications that need it.  Elsewhere, from git:
@@ -72,8 +122,8 @@ LispM's App Store installs it before the applications that need it.  Elsewhere, 
 (package-vc-install "https://github.com/LispMachineLab/lispm-kit")
 #+end_src
 
-An application names it in its =Package-Requires=, as ~(lispm-kit "0.1.0")~, and requires
-~lispm-kit-commands~.
+A program names it in its =Package-Requires=, as ~(lispm-kit "0.2.0")~, and requires the part it
+uses, ~lispm-kit-commands~ or ~lispm-kit-i18n~, or ~lispm-kit~ for both.
 
 * Testing
 

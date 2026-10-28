@@ -4,7 +4,7 @@
 
 ;; Author: Ryan.K
 ;; URL: https://github.com/LispMachineLab/lispm-kit
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Package-Requires: ((emacs "30.1"))
 ;; Keywords: lisp, extensions
 ;; SPDX-License-Identifier: AGPL-3.0-or-later
@@ -31,14 +31,19 @@
 ;;
 ;;   lispm-kit-commands.el  an application's commands, each declared
 ;;                          once: its keys, its menus, its main commands
+;;   lispm-kit-i18n.el      a program's words, in the language spoken,
+;;                          from catalogs of its own
 ;;
 ;; It is an application's to require, and knows of no interface:
 ;; Emacs's own shows what an application declares as it shows any
 ;; mode's, and another interface reads it from the mode's symbol.
+;; lispm-kit-i18n-check.el, which checks a program's catalogs against
+;; its code, is for its tests, and loads only when they require it.
 
 ;;; Code:
 
 (require 'lispm-kit-commands)
+(require 'lispm-kit-i18n)
 
 (provide 'lispm-kit)
 ;;; lispm-kit.el ends here
