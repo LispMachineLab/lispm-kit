@@ -1,6 +1,12 @@
 #+title: LispM Kit
 
-#+HTML: <p align="center"><a href="https://github.com/LispMachineLab/lispm-kit/actions/workflows/test.yml"><img src="https://github.com/LispMachineLab/lispm-kit/actions/workflows/test.yml/badge.svg" alt="test" /></a></p>
+#+begin_quote
+*Archived — Merged into [[https://github.com/LispMachineLab/lispm-ui][lispm-ui]]:* Since ~lispm-ui~ 0.8.0, =lispm-kit.el=,
+=lispm-kit-commands.el=, =lispm-kit-i18n.el= and =lispm-kit-i18n-check.el= live in
+[[https://github.com/LispMachineLab/lispm-ui][LispMachineLab/lispm-ui]] and are loaded by ~(require 'lispm-ui)~ (or ~(require 'lispm-kit)~ with
+~lispm-ui~ on ~load-path~).  Declare ~(lispm-ui "0.8.0")~ in ~Package-Requires~ instead of
+~lispm-kit~.  This repository is archived for historical reference.
+#+end_quote
 
 What LispM and the applications of its App Store are made with, in any Emacs 30.1 or later: an
 application's commands, each declared once, and a program's words, in the language spoken.  It
